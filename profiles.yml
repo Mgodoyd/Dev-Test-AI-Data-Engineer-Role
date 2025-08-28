@@ -1,0 +1,14 @@
+aidataengdevtest:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: demorag-462121
+      dataset: DevTestAIDataEngineerRole
+      threads: 4
+      keyfile: "C:/Users/godoy/Desktop/Prueba USA/aidataengdevtest/aidataengdevtest/service_account.json"
+
+# dbt debug --target dev
+# dbt run --models kpis.kpi_metrics
+# dbt run --models campaign_metrics.sql --vars '{"start_date": "2025-08-01", "end_date": "2025-08-28"}'

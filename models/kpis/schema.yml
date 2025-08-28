@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_ads_spend
+    description: "Staging de los datos de gasto publicitario"
+    columns:
+      - name: date
+        tests:
+          - not_null
+      - name: spend
+        tests:
+          - not_null
+          - numeric
+
+  - name: kpi_metrics
+    description: "Métricas de marketing (CAC y ROAS con comparación de 30 días)"
