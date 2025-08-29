@@ -179,7 +179,7 @@ Google Drive CSV → N8N Workflow → BigQuery → dbt Models → API Endpoints 
 ### Installation Steps
 1. **Clone Repository**:
    ```bash
-   git clone [repository](https://github.com/Mgodoyd/Dev-Test-AI-Data-Engineer-Role.git)
+   git clone this respository
    cd aidataengdevtest
    ```
 
@@ -457,7 +457,7 @@ CSV Google Drive → Workflow N8N → BigQuery → Modelos dbt → Endpoints API
 ### Pasos de Instalación
 1. **Clonar Repositorio**:
    ```bash
-   git clone [repositorio](https://github.com/Mgodoyd/Dev-Test-AI-Data-Engineer-Role.git)
+   git clone este repositorio
    cd aidataengdevtest
    ```
 
