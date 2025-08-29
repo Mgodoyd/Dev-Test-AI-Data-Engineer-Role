@@ -175,12 +175,11 @@ Google Drive CSV → N8N Workflow → BigQuery → dbt Models → API Endpoints 
 3. **OpenAI API**: GPT-4 models access
 4. **Python 3.8+**: For BigQuery operations and dbt
 5. **dbt**: For data modeling
-6. **Google Cloud SDK**: For authentication and project setup
 
 ### Installation Steps
 1. **Clone Repository**:
    ```bash
-   git clone [repository-url]
+   git clone [repository](https://github.com/Mgodoyd/Dev-Test-AI-Data-Engineer-Role.git)
    cd aidataengdevtest
    ```
 
@@ -458,20 +457,14 @@ CSV Google Drive → Workflow N8N → BigQuery → Modelos dbt → Endpoints API
 ### Pasos de Instalación
 1. **Clonar Repositorio**:
    ```bash
-   git clone [url-del-repositorio]
+   git clone [repositorio](https://github.com/Mgodoyd/Dev-Test-AI-Data-Engineer-Role.git)
    cd aidataengdevtest
    ```
 
 2. **Instalar Dependencias de Python**:
    ```bash
-   # Instalar librería BigQuery
-   pip install google-cloud-bigquery
-   
    # Instalar dbt
    pip install dbt-bigquery
-   
-   # Instalar dependencias adicionales
-   pip install pandas numpy
    ```
 
 3. **Configurar Credenciales de Google Cloud**:
@@ -517,8 +510,7 @@ CSV Google Drive → Workflow N8N → BigQuery → Modelos dbt → Endpoints API
 7. **Ejecutar Modelos dbt**:
    ```bash
    dbt deps
-   dbt run
-   dbt test
+   dbt debug --target dev
    ```
 
 8. **Ejecutar Modelos Específicos**:
