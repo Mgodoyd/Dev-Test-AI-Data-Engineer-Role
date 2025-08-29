@@ -1,0 +1,550 @@
+{
+  "name": "Dev Test – AI Data Engineer Role",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -32
+      ],
+      "id": "9e65f1dd-02be-4b55-97bf-4624c5f21ca1",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  item.json.load_date = new Date().toISOString();\n  item.json.source_file_name = \"ads_spend.csv\";\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -32
+      ],
+      "id": "e4c64455-0a00-4ec8-a4f9-2838ae1ced13",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "demorag-462121",
+          "mode": "list",
+          "cachedResultName": "DemoRag",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=demorag-462121"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "DevTestAIDataEngineerRole",
+          "mode": "list",
+          "cachedResultName": "DevTestAIDataEngineerRole"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "ads_spend",
+          "mode": "list",
+          "cachedResultName": "ads_spend"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        528,
+        -32
+      ],
+      "id": "9fd72b35-3176-4021-a353-435d2b03d2e4",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "Cf6cdwFMuNQF1SUJ",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are an analytical assistant familiar with the company's marketing metrics. You have access to the following data:\n\n- Table: demorag-462121.DevTestAIDataEngineerRole.ads_spend\n- Columns: date, spend, conversions\n- KPIs:\n    - CAC = spend / conversions\n    - ROAS = (conversions * 100) / spend\n\nTask:\n\n1. If the input is a greeting (e.g., \"Hi\", \"Hello\"), respond only with a greeting.  \n2. Otherwise, generate a **ready-to-run BigQuery SQL query** to calculate CAC and ROAS for the requested periods.  \n\nSQL rules:\n\n- Do **NOT** add backticks around keywords (SELECT, FROM, WHERE, AS, etc.) or column names.  \n- Use correct table formatting with backticks **only for the full table path**: `demorag-462121.DevTestAIDataEngineerRole.ads_spend`.  \n- Keep parentheses, commas, and operators intact.  \n- Fix only obvious errors:\n    1. Multiplications missing `*` (e.g., `SUM(conversions) 100` → `SUM(conversions) * 100`)  \n    2. WHERE comparisons missing operators (e.g., `date DATE_SUB(...)` → `date >= DATE_SUB(...)`)  \n    3. Literal aliases missing quotes (e.g., last_30 AS period → 'last_30' AS period)  \n- Only return the corrected SQL, no explanations or formatting around SQL.  \n\nExample question: \"Compare CAC and ROAS for last 30 days vs prior 30 days\"\n\nExpected SQL output:\n\nDECLARE omni_date DATE DEFAULT (SELECT MAX(date) FROM `demorag-462121.DevTestAIDataEngineerRole.ads_spend`);\n\nDECLARE start_date_last_30 DATE DEFAULT DATE_SUB(omni_date, INTERVAL 29 DAY);\nDECLARE start_date_prev_30 DATE DEFAULT DATE_SUB(omni_date, INTERVAL 59 DAY);\n\nWITH last_30 AS (\n    SELECT\n        'last_30' AS period,\n        SUM(spend) AS spend,\n        SUM(conversions) AS conversions,\n        SUM(conversions) * 100 AS revenue\n    FROM `demorag-462121.DevTestAIDataEngineerRole.ads_spend`\n    WHERE date BETWEEN start_date_last_30 AND omni_date\n),\nprev_30 AS (\n    SELECT\n        'prev_30' AS period,\n        SUM(spend) AS spend,\n        SUM(conversions) AS conversions,\n        SUM(conversions) * 100 AS revenue\n    FROM `demorag-462121.DevTestAIDataEngineerRole.ads_spend`\n    WHERE date BETWEEN start_date_prev_30 AND DATE_SUB(omni_date, INTERVAL 30 DAY)\n)\nSELECT\n    period,\n    SAFE_DIVIDE(spend, NULLIF(conversions, 0)) AS cac,\n    SAFE_DIVIDE(revenue, NULLIF(spend, 0)) AS roas\nFROM last_30\nUNION ALL\nSELECT\n    period,\n    SAFE_DIVIDE(spend, NULLIF(conversions, 0)) AS cac,\n    SAFE_DIVIDE(revenue, NULLIF(spend, 0)) AS roas\nFROM prev_30;\n\nNow respond to the following question:\n{{ $json.chatInput }}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        224
+      ],
+      "id": "1312045f-3ebd-44fe-92fa-a822bd2392f3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        448
+      ],
+      "id": "631d7d5d-03db-4148-bb48-dfd5a41e0ab5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "oSiTbar6sXbTuBGm",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        448
+      ],
+      "id": "16064d12-6595-432d-b00f-6147d06bb765",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        -32
+      ],
+      "id": "a7711455-fe3a-4390-8970-ed9f9991cf28",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        736,
+        -32
+      ],
+      "id": "57403a87-c43c-41f8-a4ca-e561208a6f3f",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        224
+      ],
+      "id": "992a8657-5dec-4519-ac7b-f116ea276072",
+      "name": "When chat message received",
+      "webhookId": "e1777a01-e025-4dd2-b979-360d544dd655"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "demorag-462121",
+          "mode": "list",
+          "cachedResultName": "DemoRag",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=demorag-462121"
+        },
+        "sqlQuery": "{{ $json.cleanedSql }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        912,
+        416
+      ],
+      "id": "44f77ab2-d5c1-43db-a3fa-32c32ab3d401",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "Cf6cdwFMuNQF1SUJ",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b2efa9c9-0ac9-4179-903e-18605788cb41",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "hi",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "05efa566-70b7-4a2d-a0a9-b97f2c3763ca",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "hello",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        224
+      ],
+      "id": "31bdb224-8492-4401-a6ce-59d5c8557171",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        736,
+        208
+      ],
+      "id": "f62757e1-6ca3-4548-b877-f3fa0fb96339",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an analytical assistant. You are given a JSON array with marketing metrics, each object containing: period, cac, roas.\n\nTask:\n\nRead all the data and write a single detailed natural-language summary describing the metrics for each period.\n\nUse the numbers exactly as they appear.\n\nCombine all periods into one coherent paragraph.\n\nDo not return code or additional formatting.\n\nIf comparison is not possible due to lack of data, mention it clearly.\n\nExample input structure:\n\ndata: {{ JSON.stringify($json.data) }}\n\nExpected output style:\nA single, continuous, detailed text, for example:\n\n\"In the prior 30 days, the Customer Acquisition Cost (CAC) was 32.27152764537655 and the Return on Ad Spend (ROAS) was 3.0987067330333433. This indicates that acquiring a customer cost approximately 32.27, and for every unit of currency spent on advertising, a return of 3.10 was achieved. There is no data from another period for comparison, so a detailed side-by-side summary cannot be provided. In the last 30 days, the Customer Acquisition Cost (CAC) was 29.80926061493411 and the Return on Ad Spend (ROAS) was 3.3546622068814784. This means it cost approximately 29.81 to acquire a customer, and for every unit of currency spent on advertising, a return of 3.35 was generated. There is no data provided for any other period, so a comparison between periods cannot be made.\"",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        416
+      ],
+      "id": "4955d322-4a3a-466c-a91f-92050d2f56c2",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        688
+      ],
+      "id": "e9132c1f-4606-489c-a976-6a151c7fc163",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "oSiTbar6sXbTuBGm",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1408,
+        672
+      ],
+      "id": "52ea1519-f466-461c-bad5-14c4f468c0df",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        416
+      ],
+      "id": "d845c7fc-29c9-4b81-95e5-f3ff286c9c10",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        416
+      ],
+      "id": "402f0d30-87e9-4864-9952-c33a89c88fe1",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "url": "https://drive.google.com/uc?export=download&id=1RXj_3txgmyX2Wyt9ZwM7l4axfi5A6EC-",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        -32
+      ],
+      "id": "1ef0cd19-9135-45ae-a762-2e56c9a5a9b9",
+      "name": "Download File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sql = $input.first().json.output;\n\n// Clean and fix common SQL issues\nconst cleanedSql = sql\n  // Fix multiplication like SUM(conversions) 100 → SUM(conversions) * 100\n  .replace(/SUM\\((\\w+)\\)\\s+(\\d+)/g, \"SUM($1) * $2\")\n  // Fix missing operator in WHERE date DATE_SUB(...) → date >= DATE_SUB(...)\n  .replace(/(\\bdate\\b)\\s+(DATE_SUB\\()/g, \"$1 >= $2\")\n  // Fix literal aliases without quotes: last_30 AS period → 'last_30' AS period\n  .replace(/(\\b\\w+)\\s+AS\\s+period\\b/g, \"'$1' AS period\")\n  // Fix table path: ensure single backticks around full path, no extra backticks\n  .replace(/`*demorag-462121\\.DevTestAIDataEngineerRole\\.ads_spend`*/g, \"`demorag-462121.DevTestAIDataEngineerRole.ads_spend`\");\n\nreturn { cleanedSql };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        416
+      ],
+      "id": "cfc61bcf-107a-4d17-bb8c-f2f2d37b0900",
+      "name": "Clean script"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Clean script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean script": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9a719580-f79d-48c5-84e2-48470fdd9edd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d6d1fe6c8dabbfa6620549cb4c3c1b011e276d0b094a1d8d1fec98f0caac4048"
+  },
+  "id": "UVvKSSYceVyuc9Ys",
+  "tags": []
+}
