@@ -73,6 +73,8 @@ aidataengdevtest/
 **Comparison**: Last 30 days vs Prior 30 days
 
 **Results Visualization**: See `resources/kpis.png` && `resources/kpis_table.png` for detailed analysis
+1. ![kpis](resources/kpis.png)
+2. ![kpis](resources/kpis_table.png)
 
 **Key Metrics**:
 - CAC trends and comparisons
@@ -350,6 +352,9 @@ aidataengdevtest/
 **Comparación**: Últimos 30 días vs 30 días anteriores
 
 **Visualización de Resultados**: Ver `resources/kpis.png` y `resources/kpis_table.png` para análisis detallado
+1. ![kpis](resources/kpis.png)
+2. ![kpis](resources/kpis_table.png)
+
 
 **Métricas Clave**:
 - Tendencias de CAC y comparaciones
