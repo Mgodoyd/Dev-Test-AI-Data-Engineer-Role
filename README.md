@@ -241,16 +241,16 @@ Google Drive CSV → N8N Workflow → BigQuery → dbt Models → API Endpoints 
 8. **Execute Specific Models**:
    ```bash
    # Run KPI metrics comparison (last 30 vs prior 30 days)
-   dbt run --models kpis.kpi_metrics
+   dbt run --select kpis.kpi_metrics
    
    # Run campaign metrics with custom date range
-   dbt run --models kpis.campaign_metrics --vars '{"start_date": "2025-06-01", "end_date": "2025-06-28"}'
+   dbt run --select kpis.campaign_metrics --vars '{"start_date": "2025-06-01", "end_date": "2025-06-28"}'
    
    # Run staging model
-   dbt run --models kpis.stg_ads_spend
+   dbt run --select kpis.stg_ads_spend
    
    # Test all models
-   dbt test --models kpis
+   dbt test --select kpis
    ```
 
 ---
@@ -521,16 +521,16 @@ CSV Google Drive → Workflow N8N → BigQuery → Modelos dbt → Endpoints API
 8. **Ejecutar Modelos Específicos**:
    ```bash
    # Ejecutar métricas de KPI (últimos 30 vs 30 días anteriores)
-   dbt run --models kpis.kpi_metrics
+   dbt run --select kpis.kpi_metrics
    
    # Ejecutar métricas de campaña con rango de fechas personalizado
-   dbt run --models kpis.campaign_metrics --vars '{"start_date": "2025-06-01", "end_date": "2025-06-28"}'
+   dbt run --select kpis.campaign_metrics --vars '{"start_date": "2025-06-01", "end_date": "2025-06-28"}'
    
    # Ejecutar modelo de staging
-   dbt run --models kpis.stg_ads_spend
+   dbt run --select kpis.stg_ads_spend
    
    # Probar todos los modelos
-   dbt test --models kpis
+   dbt test --select kpis
    ```
 
 ---
